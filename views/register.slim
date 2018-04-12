@@ -1,0 +1,18 @@
+h2.header2 User information
+form.register_form action="/register" method="POST"
+    input type="text" name="username" placeholder="Username"
+    input type="password" name="password" placeholder="Password"
+    input type="password" name="confirm_password" placeholder="Confirm Password"
+    input type="text" name="mail" placeholder="Mail"
+    input type="submit" value="Register" 
+
+    / h2.header2 Computer information
+
+    / form.register_form action="/computer_info" method="POST" id="computer_info"
+    /     input type="text" name="budget" placeholder="Budget"
+
+    / h3.header3 Use of computer
+    / select.computer_info name="computer_use" form="computer_info"
+    /     option value="Work" Work
+    /     option value="Gaming" Gaming
+    /     option value="Professional" Professional

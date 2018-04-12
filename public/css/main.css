@@ -1,0 +1,62 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: #263238;
+    height: 70px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.link_boxes {
+    width: 33%;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.nav_links {
+    
+    color: white;
+    font-family: 'Roboto' , sans-serif;
+    font-size: 20px;
+    text-decoration: none;
+    
+    
+}
+
+.nav_links:hover {
+    text-decoration: underline;
+}
+
+.header {
+    font-family: 'Roboto' , sans-serif;
+    margin: 16px;
+}
+
+.header2 {
+    font-family: 'Roboto' , sans-serif;
+    margin: 16px;
+}
+
+.login_form {
+    margin: 16px;
+    margin-bottom: 160px;
+}
+
+.register_form {
+    margin:16px;
+}
+
+.computer_info {
+    margin: 16px;
+}
+
+.header3 {
+    font-family: 'Roboto' , sans-serif;
+    margin-left: 16px;
+}

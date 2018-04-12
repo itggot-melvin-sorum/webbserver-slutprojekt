@@ -52,11 +52,23 @@
     margin:16px;
 }
 
-.computer_info {
-    margin: 16px;
-}
 
 .header3 {
     font-family: 'Roboto' , sans-serif;
     margin-left: 16px;
+}
+
+.error {
+    margin: 16px;
+    font-family: 'Roboto' , sans-serif;
+}
+
+.use_of_computer_header {
+    font-family: 'Roboto' , sans-serif;
+    margin-bottom: 16px;
+    margin-top: 16px;
+}
+
+.computer_use {
+    margin-bottom: 16px;
 }

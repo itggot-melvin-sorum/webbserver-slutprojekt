@@ -1,0 +1,12 @@
+h2.header2 Computer information
+
+form.register_form action="/computer_info" method="POST" id="computer_info"
+    input type="text" name="budget" placeholder="Budget (kr)"
+
+    h3.use_of_computer_header Use of computer
+    select.computer_use name="computer_use" form="computer_info"
+        option value="Work" Work
+        option value="Gaming" Gaming
+        option value="Professional" Professional
+    br
+    input type="submit" value="Complete Registration" 

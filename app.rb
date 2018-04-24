@@ -13,7 +13,7 @@ class App < Sinatra::Base
 	end
 
 	get '/' do
-		slim(:index)
+		slim(:home)
 	end
 
 	get '/home' do
@@ -36,18 +36,36 @@ class App < Sinatra::Base
 		slim(:computer_form)
 	end
 
+	get '/my_profile' do
+		slim(:my_profile)
+	end
+
 	get '/my_computer' do
 		slim(:my_computer)
 	end
 
-	post 'computer_form' do
+	post '/computer_info' do
 		db = SQLite3::Database.new('db/database.db')
-		db.results_as_hash = true
 
 		budget = params["budget"]
 		computer_use = params["computer_use"]
+		db.execute("INSERT INTO computer_info(budget, computer_use, user_id) VALUES (?,?,?)", [budget, computer_use, session[:user_id]])
+		
+		redirect('/my_computer')
+	
+	end
 
-		result = db.execute("SELECT id FROM users WHERE username=?", [username])
+	post '/my_computer' do
+		if session[:user_id] != nil
+			db = SQLite3::Database.new('db/database.db')
+			db.results_as_hash = true
+
+			result = db.execute("SELECT budget, computer_use FROM computer_info WHERE user_id=?", [session[:user_id]])	
+
+			result["budget"]
+
+		
+		end
 
 	end
 
@@ -75,6 +93,7 @@ class App < Sinatra::Base
 			set_error("Username already exists")
 			redirect('/error')
 		end	
+		redirect('/computer_form')
 	end
 
 	post '/login' do 
@@ -100,4 +119,10 @@ class App < Sinatra::Base
 			redirect('/error')
 		end
 	end
+
+	post '/logout' do
+		session[:user_id] = nil
+		redirect('/home')
+	end
+
 end           

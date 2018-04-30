@@ -72,3 +72,38 @@
 .computer_use {
     margin-bottom: 16px;
 }
+
+.box_of_cards {
+    display: flex;
+    flex-direction: row;
+    padding: 16px;
+}
+
+.component_box {
+    width: 200px;
+    height: 200px;
+    margin: 16px;
+    padding: 8px;
+    box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.7);
+}
+
+.component_header {
+    font-family: 'Roboto' , sans-serif;
+    margin-bottom: 16px;
+}
+
+.component_text {
+    font-family: 'Roboto' , sans-serif;
+    margin-bottom: 8px;
+}
+
+.component_price {
+    font-family: 'Roboto' , sans-serif;
+    margin-bottom: 8px;
+}
+
+.budget_error_header {
+    font-family: 'Roboto' , sans-serif;
+    margin-left: 32px;
+    margin-top: 16px;
+}

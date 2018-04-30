@@ -20,7 +20,7 @@ class App < Sinatra::Base
 		slim(:home)
 	end
 
-	get('/error') do
+	get '/error' do
 		slim(:error)
 	end
 
@@ -41,7 +41,117 @@ class App < Sinatra::Base
 	end
 
 	get '/my_computer' do
-		slim(:my_computer)
+		if(session[:user_id])
+			db = SQLite3::Database.new('db/database.db')
+			db.results_as_hash = true
+			result = db.execute("SELECT id FROM computer_info WHERE user_id=?", [session[:user_id]])
+
+			# Kollar om använderen har svarat på formuläret tidigare
+
+			if result.empty?
+				
+				redirect('/computer_form')
+			
+			else
+				
+				# Sätter en variabel som motsvarar priset på var och en av mina 9 datorer som byggs efter användarens önskemål. tier1=hög budget, tier2=medium budget, och tier3=låg budget
+
+				price_for_gaming_tier1_computer = db.execute("SELECT SUM(price) FROM components WHERE use IS 'gaming' AND price_range IS '1'")
+				price_for_gaming_tier2_computer = db.execute("SELECT SUM(price) FROM components WHERE use IS 'gaming' AND price_range IS '2'")
+				price_for_gaming_tier3_computer = db.execute("SELECT SUM(price) FROM components WHERE use IS 'gaming' AND price_range IS '3'") 
+				price_for_work_tier1_computer =	db.execute("SELECT SUM(price) FROM components WHERE use IS 'work' AND price_range IS '1'")
+				price_for_work_tier2_computer =	db.execute("SELECT SUM(price) FROM components WHERE use IS 'work' AND price_range IS '2'")
+				price_for_work_tier3_computer = db.execute("SELECT SUM(price) FROM components WHERE use IS 'work' AND price_range IS '3'")
+				price_for_professional_tier1_computer =	db.execute("SELECT SUM(price) FROM components WHERE use IS 'professional' AND price_range IS '1'")
+				price_for_professional_tier2_computer =	db.execute("SELECT SUM(price) FROM components WHERE use IS 'professional' AND price_range IS '2'")
+				price_for_professional_tier3_computer =	db.execute("SELECT SUM(price) FROM components WHERE use IS 'professional' AND price_range IS '3'")
+
+				# Hämtar användarens önskemål på sin dator 
+
+				users_computer = db.execute("SELECT * FROM computer_info WHERE user_id=?", [session[:user_id]])
+
+				if users_computer[0]["computer_use"] == "gaming"
+					
+					if users_computer[0]["budget"] > price_for_gaming_tier1_computer[0]["SUM(price)"]
+						computer = db.execute("SELECT * FROM components WHERE use IS 'gaming' AND price_range IS '1'")
+						slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_gaming_tier1_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+					
+					elsif users_computer[0]["budget"] > price_for_gaming_tier2_computer[0]["SUM(price)"]
+
+						computer = db.execute("SELECT * FROM components WHERE use IS 'gaming' AND price_range IS '2'")
+						slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_gaming_tier2_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+				
+					else
+						if users_computer[0]["budget"] > price_for_gaming_tier3_computer[0]["SUM(price)"]
+
+							computer = db.execute("SELECT * FROM components WHERE use IS 'gaming' AND price_range IS '3'")
+							slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_gaming_tier3_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+
+						else 
+							
+							budget_error_msg = "Can't find any recomended computer below this budget, this is the cheapest computer we could find for you:"
+							computer = db.execute("SELECT * FROM components WHERE use IS 'gaming' AND price_range IS '3'")
+							slim(:my_computer, locals:{computer:computer, budget_error:budget_error_msg, total_cost:price_for_gaming_tier3_computer[0]["SUM(price)"]}) 
+
+						end
+					end
+
+				elsif users_computer[0]["computer_use"] == "work"
+					
+					if users_computer[0]["budget"] > price_for_work_tier1_computer[0]["SUM(price)"]
+
+						computer = db.execute("SELECT * FROM components WHERE use IS 'work' AND price_range IS '1'")
+						slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_work_tier1_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+					
+					elsif users_computer[0]["budget"] > price_for_work_tier2_computer[0]["SUM(price)"]
+
+						computer = db.execute("SELECT * FROM components WHERE use IS 'work' AND price_range IS '2'")
+						slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_work_tier2_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+				
+					else
+						if users_computer[0]["budget"] > price_for_work_tier3_computer[0]["SUM(price)"]
+
+							computer = db.execute("SELECT * FROM components WHERE use IS 'work' AND price_range IS '3'")
+							slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_work_tier3_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+
+						else 
+
+							budget_error = "Can't find any recomended computer below this budget, this is the cheapest computer we could find for you:"
+							computer = db.execute("SELECT * FROM components WHERE use IS 'work' AND price_range IS '3'")
+							slim(:my_computer, locals:{computer:computer, budget_error:budget_error, total_cost:price_for_work_tier3_computer[0]["SUM(price)"]})
+
+						end
+					end
+
+				else users_computer[0]["computer_use"] == "professional"
+					
+					if users_computer[0]["budget"] > price_for_professional_tier1_computer[0]["SUM(price)"]
+
+						computer = db.execute("SELECT * FROM components WHERE use IS 'professional' AND price_range IS '1'")
+						slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_professional_tier1_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+					
+					elsif users_computer[0]["budget"] > price_for_professional_tier2_computer[0]["SUM(price)"]
+
+						computer = db.execute("SELECT * FROM components WHERE use IS 'professional' AND price_range IS '2'")
+						slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_professional_tier2_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+				
+					else
+						if users_computer[0]["budget"] > price_for_professional_tier3_computer[0]["SUM(price)"]
+
+							computer = db.execute("SELECT * FROM components WHERE use IS 'professional' AND price_range IS '3'")
+							slim(:my_computer, locals:{computer:computer, budget_error:"", total_cost:price_for_professional_tier3_computer[0]["SUM(price)"]}) #Ta bort budget_error ifall det går
+
+						else 
+
+							budget_error = "Can't find any recomended computer below this budget, this is the cheapest computer we could find for you:"
+							computer = db.execute("SELECT * FROM components WHERE use IS 'professional' AND price_range IS '3'")
+							slim(:my_computer, locals:{computer:computer, budget_error:budget_error, total_cost:price_for_professional_tier3_computer[0]["SUM(price)"]})
+
+						end
+					end
+				end
+			end
+		end
 	end
 
 	post '/computer_info' do
@@ -55,19 +165,7 @@ class App < Sinatra::Base
 	
 	end
 
-	post '/my_computer' do
-		if session[:user_id] != nil
-			db = SQLite3::Database.new('db/database.db')
-			db.results_as_hash = true
 
-			result = db.execute("SELECT budget, computer_use FROM computer_info WHERE user_id=?", [session[:user_id]])	
-
-			result["budget"]
-
-		
-		end
-
-	end
 
 	post '/register' do
 		db = SQLite3::Database.new('db/database.db')
@@ -93,7 +191,6 @@ class App < Sinatra::Base
 			set_error("Username already exists")
 			redirect('/error')
 		end	
-		redirect('/computer_form')
 	end
 
 	post '/login' do 

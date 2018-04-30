@@ -1,0 +1,12 @@
+-if budget_error != nil
+    h3.budget_error_header #{budget_error}
+.box_of_cards
+    - i = 0
+    - while i < computer.length
+        .component_box
+            h3.component_header = computer[i]["type"].capitalize
+            p.component_text = computer[i]["model"]
+            h4.component_price = "#{computer[i]["price"]} kr" 
+        - i += 1 
+h3.total_cost = "Total cost: #{total_cost}"
+        

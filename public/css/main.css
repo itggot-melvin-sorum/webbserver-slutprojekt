@@ -107,3 +107,27 @@
     margin-left: 32px;
     margin-top: 16px;
 }
+
+.total_cost {
+    font-family: 'Roboto' , sans-serif;
+    position: fixed;
+    right: 0px;
+    margin: 32px;
+}
+
+.home_header {
+    font-family: 'Roboto' , sans-serif;
+    margin-left: 16px;
+    margin-top: 16px;
+}
+
+.logout_button {
+    margin: 16px;
+    font-size: 1.5em;
+}
+
+.component_store_text {
+    font-family: 'Roboto' , sans-serif;
+    margin-bottom: 16px;
+
+}

@@ -38,7 +38,7 @@ class App < Sinatra::Base
 
 		result = db.execute("SELECT id FROM computer_info WHERE user_id=?", [session[:user_id]])
 
-		#Gör så att ifall man redan har svarat på formuläret eller inte är inloggad ska man inte komma in på sidan
+		#Gör så att ifall man redan har svarat på formuläret eller inte är inloggad ska man inte komma in på den
 
 		if(session[:user_id])
 			if result.empty?
@@ -64,21 +64,17 @@ class App < Sinatra::Base
 			result = db.execute("SELECT id FROM computer_info WHERE user_id=?", [session[:user_id]])
 
 			# Kollar om använderen har svarat på formuläret tidigare
+		
 			if result.empty?
 				redirect('/computer_form')
 			else
 
-				# p computer
-				# [{"id"=>1, "type"=>"graphics_card", "price"=>9190, "use"=>"gaming", "model"=>"Asus GeForce GTX 1080 Ti Strix Gaming OC 2xHDMI 2xDP 11GB", "price_range"=>1, 0=>1, 1=>"graphics_card", 2=>9190, 3=>"gaming", 4=>"Asus GeForce GTX 1080 Ti Strix Gaming OC 2xHDMI 2xDP 11GB", 5=>1}, {"id"=>2, "type"=>"motherboard", "price"=>2379, "use"=>"gaming", "model"=>"Asus ROG Strix Z370-E Gaming", "price_range"=>1, 0=>2, 1=>"motherboard", 2=>2379, 3=>"gaming", 4=>"Asus ROG Strix Z370-E Gaming", 5=>1}]
-
-				# "stores" => ["inet", "elgiganten"]
-
-				# my_hash = {"id"=>1, "type"=>"graphics_card", "price"=>9190, "cool_factor"=> 10000}
-				#
-
 				users_computer = db.execute("SELECT * FROM computer_info WHERE user_id=?", [session[:user_id]])
 				budget = users_computer[0]["budget"].to_i
 				use = users_computer[0]["computer_use"]
+
+				# Loopar igenom alla prisklasser för det användninsområdet som är kopplat till användaren 
+				# Sedan "break:ar" den loopen då prisklassen passar användarens budget och skickar senare den relevanta komponenterna till slim-filen
 
 				i = 1
 				while i <= 3
@@ -90,10 +86,13 @@ class App < Sinatra::Base
 					end
 
 					if total.to_i < budget.to_i
-						# Correct pc
+
 						break
+
 					elsif i == 3
-						# felhantering
+						
+						# Felhantering om användarens budget är mindre än den lägsta prisklassen
+						
 						error = true
 						break
 					end
@@ -101,12 +100,14 @@ class App < Sinatra::Base
 					i += 1
 				end
 
+				# Lägger till vilka butiker där komponenterna går att köpa, sedan läggs dessa butiker in i "computer" som sedan skickas till slim-filen
+
 				models = []
 				computer.each_with_index do |part, i|
 
-					thisisid = db.execute('SELECT id FROM components WHERE model IS ? LIMIT 1', [part["model"]]).first.first
+					this_is_id = db.execute('SELECT id FROM components WHERE model IS ? LIMIT 1', [part["model"]]).first.first
 					
-					stores = db.execute("SELECT store FROM stores WHERE id IN (SELECT store_id FROM component_store WHERE component_id IS ?)", thisisid[1])
+					stores = db.execute("SELECT store FROM stores WHERE id IN (SELECT store_id FROM component_store WHERE component_id IS ?)", this_is_id[1])
 
 					arr = []
 					stores.each do |store|
@@ -118,7 +119,7 @@ class App < Sinatra::Base
 				end
 
 				if error
-					slim(:my_computer, locals:{computer: computer, budget_error:"Hittade ingen dator för din budget, detta var den billigaste", total_cost: total})
+					slim(:my_computer, locals:{computer: computer, budget_error:"Couldn't find a recommended computer matching your budget, this is the cheapest one we could find:", total_cost: total})
 				else
 					slim(:my_computer, locals:{computer: computer, budget_error:"", total_cost: total})
 				end
@@ -140,8 +141,6 @@ class App < Sinatra::Base
 		redirect('/my_computer')
 
 	end
-
-
 
 	post '/register' do
 		db = SQLite3::Database.new('db/database.db')
@@ -195,7 +194,7 @@ class App < Sinatra::Base
 
 	post '/logout' do
 		session[:user_id] = nil
-		redirect('/home')
+		redirect('/login')
 	end
 
 end

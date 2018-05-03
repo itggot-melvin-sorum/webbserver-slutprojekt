@@ -7,7 +7,8 @@
             h3.component_header = computer[i]["type"].capitalize
             p.component_text = computer[i]["model"]
             h4.component_price = "#{computer[i]["price"]} kr" 
+            h4.component_store_header Köp den hos:
             - computer[i]["stores"].each do |store|
-                p.component_store_text =  "Köp den hos: #{store}"
+                p.component_store_text =  "#{store}"
         - i += 1 
 h3.total_cost = "Total cost: #{total_cost} kr"        
